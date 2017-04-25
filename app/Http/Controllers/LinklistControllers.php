@@ -21,9 +21,7 @@ class LinklistControllers extends Controller
   // private $testList = new MyLinkedlist();
   function __construct()
   {
-    // $this->list = array('1','2','3');
-    // $myArr = array('i','am','little','bean');
-    // $this->MyList = new MyLinkedlist($myArr);
+    $this->middleware('auth');
   }
 
   //构造页面
@@ -107,7 +105,7 @@ class LinklistControllers extends Controller
       echo "输入的位置错误";
     }
     else{
-      for($i = $input-1;$i<count($value)-1;$i--){
+      for($i = $input-1;$i<count($value)-1;$i++){
         $value[$i]=$value[$i+1];
       }
       array_pop($value);

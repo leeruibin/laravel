@@ -5,7 +5,7 @@
 </head>
 <body>
   <h1>删除链表中的元素</h1>
-  <form action="{{url('/list/delete_request')}}" method="get">
+  <form action="{{url('/list/delete_request')}}" method="post">
 
        输入要删除的元素的位置: <input type="text" name="deleta_location"><br>
 

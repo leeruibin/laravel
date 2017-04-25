@@ -2,6 +2,7 @@
 
 
 use Illuminate\Http\Request;
+use App\Article;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,91 +13,54 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// Route::get('/',function(){
-//   return view('hello world');
-// });
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-
-// Route::get('/', function () {
-//     return view('Blog.BlogTest', ['post_name' => 'a normal post']);
-// });
-
-
-// post module
-//
-// show add post page
-// Route::get('/article', function(){
-//    return view('Blog.add');
-// });
-
-Route::get('/lee',function(){
-  return 'hello world';
-});
-// $url = route('profile');
-// $leeruibin = redirect()->$url;
-
-//重名名方法出错有待解决
-//add a post
-Route::post('/article', 'BlogController@add');
-
-// Route::get('/lee','MyController@show');
-
-Route::get('/little',function(){
-  return 'funny';
-})->name('little');
-// $url = route('little');
-// $leeruibin = redirect()->route('little');
-// $leeruibin = route('little');
-//update a post
-
-// Route::put('/article/{id}', 'BlogController@update');
-//
-// Route::get('/article/update/{id}', function($id){
-//    return view('Blog.update', ['id' => $id]);
-// });
-// Route::get('/article/delete/{id}', function($id){
-//     return view('Blog.delete', ['id' => $id]);
-// });
-// //delete a post
-// Route::delete('/article/{id}', 'BlogController@delete');
-//
-// //get a post
-// Route::get('/article/{id}', ['uses'=> 'BlogController@get', 'as'=> 'getPost']);
-// Auth::routes();
-//
-// Route::get('/home', 'HomeController@index');
-
-Route::get('cookieset', function()
-{
-    $arr = array('1','2','3','4','5');
-    array_splice($arr,1,1);
-    $asd = 'asd';
-    $user = Cookie::make('user',$arr,30);
-    return Response::make()->withCookie($user);
+//获得welcome引导页面
+Route::get('/',function(){
+  $user = Auth::user();
+  return view('welcome')->with('user',$user);
 });
 
-Route::get('cookietest', 'LinklistControllers@test');//function(Request $request)
-// {
-//     $cookit = Cookie::get('user');
-//     $value = $request->cookie('arr');
-//     echo $value[1];
-//     // $asd = 'asd';
-//     // $cookit = Cookie::make('user',$asd,30);
-//     dd($cookit);//Cookie::get('user'));
-// });
-
-Route::get('test','LinklistControllers@test');
-
-Route::get('/list/testInput',function(){
-
+Route::get('fuck',function(){
+  return view('fuck');
 });
 
-Route::get('/test','LinklistControllers@test');
+Route::get('now', function () {
+    return date("Y-m-d H:i:s");
+});
 
+Route::get('home','HomeController@index')->name('user_home');
+
+Route::get('search',function(Request $request){
+  $id = $request->get('search' );
+  $user = Auth::user();
+  if( is_numeric($id) ){
+    if(Article::find($id) != null ){
+      return view('article/show')->withArticle(Article::with('hasManyComments')->find($id))->with('user',$user);
+    }
+  }
+});
+
+Route::get('article/{id}', 'ArticleController@show');
+
+Route::resource('comment','CommentController');
+Route::resource('article','ArticleController');
+Route::resource('user','UserController');
+//更好的后台管理功能
+Route::group(['middleware' => 'auth', 'namespace' => 'Admin', 'prefix' => 'admin'], function() {
+    Route::get('/','HomeController@index');
+    Route::resource('article', 'ArticleController');
+    Route::resource('comment','CommentController');
+    Route::resource('user','UserController');
+    Route::get('/user/{id}/state','UserController@adminState');
+});
+
+Route::get('/info', function(){
+  phpinfo();
+});
+//链表实现区域
+
+Route::get('LinkIndex/info',function(){
+  return view('LinkIndexinfo');
+});
 
 Route::get('/list/construct','LinklistControllers@construct');
 
@@ -112,15 +76,14 @@ Route::get('list/print','LinklistControllers@print_list');
 
 Route::get('list/size','LinklistControllers@size');
 
-Route::get('list/construct_request','LinklistControllers@construct_request');
+Route::post('list/construct_request','LinklistControllers@construct_request');
 
-Route::get('list/insert_request','LinklistControllers@insert_request');
+Route::post('list/insert_request','LinklistControllers@insert_request');
 
-Route::get('list/pop_request','LinklistControllers@pop_request');
+Route::post('list/pop_request','LinklistControllers@pop_request');
 
-Route::get('list/push_request','LinklistControllers@push_request');
+Route::post('list/push_request','LinklistControllers@push_request');
 
-Route::get('list/delete_request','LinklistControllers@delete_request');
+Route::post('list/delete_request','LinklistControllers@delete_request');
 
-
-Route::get('list/hello','LinklistControllers@test');
+Auth::routes();
